@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Reverse IP Tools</title>
+  <meta content="Reverse IP Tools - Takes a domain or IP address and does a reverse lookup to quickly shows all other domains hosted from the same server. Useful for finding phishing sites or identifying other sites on the same shared hosting server." name="description">
+  <meta content="reverse ip, DNS, IP, reverseip-tools.com, free reverse ip, reverse dns, reverse domain, reverse, Reverse IP Tools" name="keywords">
+  <meta name="google-site-verification" content="Nrr9OqQOFcDd6Lxgwraf0Dioe7S8a4i0WPi4JPIhuQY" />
+  <link href="https://cdn1.iconfinder.com/data/icons/web-hosting-2-4/52/187-512.png" rel="icon">
+  <meta property="og:type" content=article><meta property="og:image" content="https://www.cacloud.com/style/images/mxtxt01.png" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <header id="header" class="fixed-top ">
+    <div class="container d-flex align-items-center">
+      <h1 class="logo me-auto"><a href="/">Reverse-IP</a></h1>
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto active" href="/">Home</a></li>
+          <li><a class="nav-link scrollto" href="/api-docs">Api Docs</a></li>
+          <li><a class="nav-link scrollto" href="https://t.me/zeerx7">Contact</a></li>
+          <li><a class="nav-link scrollto" href="https://saweria.co/pausi">Donation</a></li>
+          <li><a class="getstarted scrollto" href="https://github.com/404rgr/reverse-ip" target="_blank">Github</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav>
+    </div>
+  </header>
+  <section id="hero" class="d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
+          <h1>Best Reverse Ip Tool</h1>
+          <h2>Takes a domain or IP address and does a reverse lookup to quickly shows all other domains hosted from the same server. Useful for finding phishing sites or identifying other sites on the same shared hosting server.</h2>
+          <div class="d-flex justify-content-center justify-content-lg-start">
+            <a href="#main" class="btn-get-started scrollto">Get Started</a>
+          </div>
+        </div>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
+          <img src="https://www.cacloud.com/style/images/mxtxt01.png" class="img-fluid animated" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+  <main id="main">
+    <section id="footer">
+      <div class="footer-newsletter" style="text-align: left;margin-bottom: -60px;margin-top: -60px;padding-bottom: 100px;" data-aos="fade-up">
+        <div class="container">
+          <div class="row" id="reverseip">
+            <div class="col-lg-12">
+              <h4>Reverse IP Lookup</h4>
+              <form action="" method="post" onsubmit="return false">
+                <input type="text" style="width: 100%;" v-model="ip_input" placeholder="enter domain or ip address" required>
+                <input type="submit" value="Submit" v-on:click="submit()">
+              </form>
+              <div style="margin-left: 10%;position: fixed;" v-if="loading">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+              </div>
+              <div style="padding-top:28px">
+                <p v-if="r_inf">Reverse IP results for {{dom_result}} ({{ip_result}}) with {{len_result}} domains.</p>
+                <p v-if="r_inf">The full list is below:</p>
+                <pre class="presult" v-if="result" id="result">{{result}}</pre>
+                <input type="button" value="Copy Domains" class="copy" v-if="c_d" onclick="CopyToClipboard('result')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main> 
+  <script>
+    new Vue({
+      el: '#reverseip',
+      data: {
+        'ip_input': '',
+        'result': ``,
+        'ip_result': '',
+        'dom_result': '',
+        'len_result': '',
+        'c_d': false,
+        'r_inf': false,
+        'loading': false,
+      },
+      methods: {
+        submit: function(){
+          var url = 'https://reverseip-tools.com/api?q='+this.ip_input;
+          var end_req = false;
+          var sintv = setInterval(function() {
+            this.loading = true;
+            if (end_req == true) {
+              this.loading = false;
+              clearInterval(sintv);
+            }
+          }.bind(this),300);
+          axios.get(url).then((response) => {
+            if (response.data['status'] == 200) {
+              this.ip_result = response.data['ip'];
+              this.dom_result = this.ip_input;
+              this.len_result = response.data['result'].length;
+              this.result = response.data['result'].join('\n');
+              this.r_inf = true;
+              if (this.len_result > 0) {
+                this.c_d = true;
+              }
+            }else{
+              if (response.data['message']) {
+                this.result = response.data['message'];
+              }else{
+                this.result = 'Error, Try Again!';
+              }
+            }
+            end_req = true;
+          });
+        }
+      }
+    });
+    function CopyToClipboard(id){
+        var r = document.createRange();
+        r.selectNode(document.getElementById(id));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(r);
+        try {
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('Successfully copy domains result');
+        } catch (err) {
+            alert('Unable to copy!');
+        }
+    }
+  </script>
+  <footer id="footer">
+    <div class="container footer-bottom clearfix">
+      <div class="copyright">
+        Copyright &copy; 2021 <span>reverseip-tools</span>. All Rights Reserved
+      </div>
+      <div class="credits">
+        Powered by <a href="https://github.com/404rgr" style="font-size: 13px;color: white;"target="_blank">Zeerx7</a>, <a href="https://zone-xsec.com/" style="font-size: 13px;color: white;"target="_blank">[zone-xsec.com]</a>
+      </div>
+    </div>
+  </footer> 
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
